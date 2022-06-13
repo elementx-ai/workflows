@@ -33,6 +33,10 @@ on:
       command:
         required: true
         type: string
+      output-dir:
+        required: false
+        default: output/
+        type: string
 
     secrets:
       GCP_CREDENTIALS:
@@ -137,6 +141,13 @@ jobs:
 
       - name: Run Command
         run: ${{ inputs.command }}
+
+      - name: Attach Output to Run
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: output
+          path: ${{ inputs.output-dir }}
 
       - name: Unmount Bucket
         if: ${{ inputs.bucket != '' && always() }}
