@@ -1,0 +1,44 @@
+---
+name: Python PR Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          # Full git history is needed to get a proper list of changed files
+          # within `super-linter`
+          fetch-depth: 0
+
+      - name: Checkout Linters
+        uses: actions/checkout@v3
+        with:
+          repository: 'spark-64/workflows'
+          path: 'workflows'
+
+      - name: Lint Code Base
+        uses: github/super-linter/slim@v4
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          DEFAULT_BRANCH: main
+          LINTER_RULES_PATH: "/"
+          GITHUB_TOKEN: ${{ github.token }}
+          IGNORE_GITIGNORED_FILES: true
+          IGNORE_GENERATED_FILES: true
+          # Skip flake8 as configuring it is annoying and
+          # it's redundant to pylint
+          VALIDATE_PYTHON_FLAKE8: false
+          # Do almost all config in pyproject.toml
+          PYTHON_BLACK_CONFIG_FILE: "pyproject.toml"
+          PYTHON_ISORT_CONFIG_FILE: "pyproject.toml"
+          PYTHON_MYPY_CONFIG_FILE: "pyproject.toml"
+          # Pylint config is in a seperate file because
+          # we have a very large config
+          PYTHON_PYLINT_CONFIG_FILE: "workflows/linters/.pylintrc"
+          GITHUB_ACTIONS_CONFIG_FILE: "workflows/linters/actions.yaml"
+          JSCPD_CONFIG_FILE: "workflows/linters/jscpd.json"

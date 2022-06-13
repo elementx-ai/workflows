@@ -1,0 +1,143 @@
+---
+name: Python PR CML
+
+on:
+  workflow_call:
+    inputs:
+      cloud:
+        required: false
+        default: gcp
+        type: string
+      cloud-region:
+        required: false
+        default: us-central1-a
+        type: string
+      cloud-type:
+        required: false
+        default: n2-standard-4
+        type: string
+      cloud-gpu:
+        required: false
+        default: nogpu
+        type: string
+      cloud-hdd-size:
+        required: false
+        default: 35
+        type: number
+      cloud-permissions-set:
+        required: true
+        type: string
+      bucket:
+        required: false
+        type: string
+      command:
+        required: true
+        type: string
+
+    secrets:
+      GCP_CREDENTIALS:
+        required: true
+      CML_GITHUB_APP_PEM:
+        required: true
+      CML_GITHUB_APP_ID:
+        required: true
+
+jobs:
+  deploy-runner:
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS_DATA: ${{ secrets.GCP_CREDENTIALS }}
+    steps:
+      - name: Generate Token
+        uses: navikt/github-app-token-generator@v1
+        id: get_token
+        with:
+          private-key: ${{ secrets.CML_GITHUB_APP_PEM }}
+          app-id: ${{ secrets.CML_GITHUB_APP_ID }}
+
+      - name: Insert Token into ENV
+        run: echo "REPO_TOKEN=$REPO_TOKEN" >> "$GITHUB_ENV"
+        env:
+          REPO_TOKEN: ${{ steps.get_token.outputs.token }}
+
+      - name: Setup CML
+        uses: iterative/setup-cml@v1
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy runner
+        run: |
+          cml runner \
+            --cloud ${{ inputs.cloud }} \
+            --cloud-region ${{ inputs.cloud-region }} \
+            --cloud-type ${{ inputs.cloud-type }} \
+            --cloud-gpu ${{ inputs.cloud-gpu }} \
+            --cloud-hdd-size ${{ inputs.cloud-hdd-size }} \
+            --cloud-permission-set ${{ inputs.cloud-permissions-set }} \
+            --single
+
+  cml-run-command:
+    runs-on: [self-hosted, cml]
+    needs: deploy-runner
+    timeout-minutes: 4320
+    env:
+      REPO_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup CML
+        uses: iterative/setup-cml@v1
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v2.1.4
+        with:
+          poetry-version: 1.2.0b2
+
+      - name: Disable Poetry Virtual Env Creation
+        run: poetry config virtualenvs.create false
+
+      - name: Add Poetry Google Artifact Registry Auth Plugin
+        run: poetry plugin add keyrings.google-artifactregistry-auth
+
+      - name: Poetry Install
+        run: poetry install
+
+      - name: Setup GCSFuse
+        if: ${{ inputs.bucket != '' }}
+        run: |
+          GCSFUSE_REPO=gcsfuse-$(lsb_release -c -s)
+          export GCSFUSE_REPO
+          echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          sudo apt-get update && sudo apt-get install gcsfuse
+
+      - name: Mount Bucket
+        if: ${{ inputs.bucket != '' }}
+        run: |
+          mkdir -p bucket
+          gcsfuse ${{ inputs.bucket }} bucket/
+
+      - name: Setup GPU Drivers
+        if: ${{ inputs.cloud-gpu != 'nogpu'}}
+        run: |
+          curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
+          sudo python3 install_gpu_driver.py
+
+      - name: Run Command
+        run: ${{ inputs.command }}
+
+      - name: Unmount Bucket
+        if: ${{ inputs.bucket != '' && always() }}
+        run: fusermount -u bucket/

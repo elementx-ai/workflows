@@ -1,0 +1,31 @@
+---
+name: Docker PR Build
+
+on:
+  workflow_call:
+    secrets:
+      GOOGLE_SAINET_GITHUB_KEY:
+        required: true
+      GOOGLE_SAINET_ARTIFACT_READER_KEY:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authorize Google
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: "${{ secrets.GOOGLE_SAINET_GITHUB_KEY }}"
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Store Artifact Reader credentials into json file
+        run: echo ${{ secrets.GOOGLE_SAINET_ARTIFACT_READER_KEY }} >> credentials.json
+
+      - name: Build
+        run: DOCKER_BUILDKIT=1 docker build --platform linux/amd64 .
