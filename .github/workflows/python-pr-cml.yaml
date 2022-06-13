@@ -27,9 +27,6 @@ on:
       cloud-permissions-set:
         required: true
         type: string
-      bucket:
-        required: false
-        type: string
       command:
         required: true
         type: string
@@ -41,14 +38,38 @@ on:
     secrets:
       GCP_CREDENTIALS:
         required: true
+      GOOGLE_SAINET_DATASET_BUCKET:
+        required: true
       CML_GITHUB_APP_PEM:
         required: true
       CML_GITHUB_APP_ID:
         required: true
 
 jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      message: ${{ steps.get-message.outputs.message }}"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # for pull_request so we can do HEAD^2
+          fetch-depth: 2
+
+      - name: Get commit message
+        id: get-message
+        run: |
+          if [[ '${{ github.event_name }}' == 'push' ]]; then
+            echo ::set-output name=message::$(git log --format=%B -n 1 HEAD)
+          elif [[ '${{ github.event_name }}' == 'pull_request' ]]; then
+            echo ::set-output name=message::$(git log --format=%B -n 1 HEAD^2)
+          fi
+
   deploy-runner:
     runs-on: ubuntu-latest
+    needs: init
+    if: ${{ startsWith(needs.init.outputs.message, 'cml') }}
     env:
       GOOGLE_APPLICATION_CREDENTIALS_DATA: ${{ secrets.GCP_CREDENTIALS }}
     steps:
@@ -128,10 +149,9 @@ jobs:
           sudo apt-get update && sudo apt-get install gcsfuse
 
       - name: Mount Bucket
-        if: ${{ inputs.bucket != '' }}
         run: |
-          mkdir -p bucket
-          gcsfuse ${{ inputs.bucket }} bucket/
+          mkdir -p dataset-bucket
+          gcsfuse ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }} dataset-bucket/
 
       - name: Setup GPU Drivers
         if: ${{ inputs.cloud-gpu != 'nogpu'}}
@@ -150,5 +170,5 @@ jobs:
           path: ${{ inputs.output-dir }}
 
       - name: Unmount Bucket
-        if: ${{ inputs.bucket != '' && always() }}
-        run: fusermount -u bucket/
+        if: ${{ always() }}
+        run: fusermount -u ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }}/
