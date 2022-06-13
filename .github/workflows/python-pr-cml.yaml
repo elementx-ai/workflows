@@ -27,9 +27,6 @@ on:
       cloud-permissions-set:
         required: true
         type: string
-      bucket:
-        required: false
-        type: string
       command:
         required: true
         type: string
@@ -40,6 +37,8 @@ on:
 
     secrets:
       GCP_CREDENTIALS:
+        required: true
+      GOOGLE_SAINET_DATASET_BUCKET:
         required: true
       CML_GITHUB_APP_PEM:
         required: true
@@ -150,10 +149,9 @@ jobs:
           sudo apt-get update && sudo apt-get install gcsfuse
 
       - name: Mount Bucket
-        if: ${{ inputs.bucket != '' }}
         run: |
-          mkdir -p bucket
-          gcsfuse ${{ inputs.bucket }} bucket/
+          mkdir -p ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }}
+          gcsfuse ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }} ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }}/
 
       - name: Setup GPU Drivers
         if: ${{ inputs.cloud-gpu != 'nogpu'}}
@@ -172,5 +170,5 @@ jobs:
           path: ${{ inputs.output-dir }}
 
       - name: Unmount Bucket
-        if: ${{ inputs.bucket != '' && always() }}
-        run: fusermount -u bucket/
+        if: ${{ always() }}
+        run: fusermount -u ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }}/
