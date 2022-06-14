@@ -140,7 +140,6 @@ jobs:
         run: poetry install
 
       - name: Setup GCSFuse
-        if: ${{ inputs.bucket != '' }}
         run: |
           GCSFUSE_REPO=gcsfuse-$(lsb_release -c -s)
           export GCSFUSE_REPO
@@ -160,7 +159,7 @@ jobs:
           sudo python3 install_gpu_driver.py
 
       -name: Create Output Folder
-        run: mkdir ${{ inputs.output-dir }}
+        run: mkdir -p ${{ inputs.output-dir }}
 
       - name: Run Command
         run: ${{ inputs.command }}
