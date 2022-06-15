@@ -158,7 +158,7 @@ jobs:
           curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
           sudo python3 install_gpu_driver.py
 
-      -name: Create Output Folder
+      - name: Create Output Folder
         run: mkdir -p ${{ inputs.output-dir }}
 
       - name: Run Command
