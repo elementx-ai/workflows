@@ -106,19 +106,14 @@ jobs:
     runs-on: [self-hosted, cml]
     needs: deploy-runner
     timeout-minutes: 4320
+    container:
+      image: gcr.io/deeplearning-platform-release/base-cu113
+      options: --gpus all --privileged
     env:
       REPO_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Setup CML
-        uses: iterative/setup-cml@v1
-
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
 
       - name: Setup Python
         uses: actions/setup-python@v2
@@ -152,12 +147,6 @@ jobs:
           mkdir -p dataset-bucket
           gcsfuse ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }} dataset-bucket/
 
-      - name: Setup GPU Drivers
-        if: ${{ inputs.cloud-gpu != 'nogpu'}}
-        run: |
-          curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
-          sudo python3 install_gpu_driver.py
-
       - name: Create Output Folder
         run: mkdir -p ${{ inputs.output-dir }}
 
@@ -173,4 +162,4 @@ jobs:
 
       - name: Unmount Bucket
         if: ${{ always() }}
-        run: fusermount -u ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }}/
+        run: fusermount -u dataset-bucket/
