@@ -173,4 +173,4 @@ jobs:
 
       - name: Unmount Bucket
         if: ${{ always() }}
-        run: fusermount -u ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }}/
+        run: fusermount -u dataset-bucket/
