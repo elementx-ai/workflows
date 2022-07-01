@@ -69,7 +69,7 @@ jobs:
   deploy-runner:
     runs-on: ubuntu-latest
     needs: init
-    if: ${{ startsWith(needs.init.outputs.message, 'cml') }}
+    if: ${{ startsWith(needs.init.outputs.message, 'cml') || github.event.action == "workflow_dispatch"}}
     env:
       GOOGLE_APPLICATION_CREDENTIALS_DATA: ${{ secrets.GCP_CREDENTIALS }}
     steps:
