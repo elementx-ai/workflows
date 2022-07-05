@@ -95,7 +95,6 @@ jobs:
             --cloud-type ${{ inputs.cloud-type }} \
             --cloud-hdd-size ${{ inputs.cloud-hdd-size }} \
             --cloud-permission-set ${{ inputs.cloud-permissions-set }} \
-            --cloud-gpu no-gpu \
             --single
 
   cml-run-command:
