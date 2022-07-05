@@ -16,10 +16,6 @@ on:
         required: false
         default: n2-standard-4
         type: string
-      cloud-gpu:
-        required: false
-        default: nogpu
-        type: string
       cloud-hdd-size:
         required: false
         default: 35
@@ -97,9 +93,9 @@ jobs:
             --cloud ${{ inputs.cloud }} \
             --cloud-region ${{ inputs.cloud-region }} \
             --cloud-type ${{ inputs.cloud-type }} \
-            --cloud-gpu ${{ inputs.cloud-gpu }} \
             --cloud-hdd-size ${{ inputs.cloud-hdd-size }} \
             --cloud-permission-set ${{ inputs.cloud-permissions-set }} \
+            --cloud-gpu no-gpu \
             --single
 
   cml-run-command:
@@ -150,10 +146,10 @@ jobs:
       - name: Mount Bucket
         run: |
           mkdir -p dataset-bucket
-          gcsfuse ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }} dataset-bucket/
+          gcsfuse --implicit-dirs ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }} dataset-bucket/
 
       - name: Setup GPU Drivers
-        if: ${{ inputs.cloud-gpu != 'nogpu'}}
+        if: ${{ contains(inputs.cloud-type, 'nvidia') }}
         run: |
           curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
           sudo python3 install_gpu_driver.py
