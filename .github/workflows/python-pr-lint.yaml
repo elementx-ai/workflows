@@ -42,3 +42,4 @@ jobs:
           PYTHON_PYLINT_CONFIG_FILE: "workflows/linters/.pylintrc"
           GITHUB_ACTIONS_CONFIG_FILE: "workflows/linters/actions.yaml"
           JSCPD_CONFIG_FILE: "workflows/linters/jscpd.json"
+          DOCKERFILE_HADOLINT_FILE_NAME: "workflows/linters/hadolint.yaml"
