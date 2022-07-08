@@ -1,0 +1,6 @@
+rules:
+  terminology:
+    skip:
+      - "bug[- ]fix(es)?"
+      - GitHub
+      - "lock[- ]file(s)?"
