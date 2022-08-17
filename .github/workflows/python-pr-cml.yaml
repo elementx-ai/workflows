@@ -16,6 +16,10 @@ on:
         required: false
         default: n2-standard-4
         type: string
+      cloud-gpu:
+        required: false
+        default: nogpu
+        type: string
       cloud-hdd-size:
         required: false
         default: 35
@@ -93,6 +97,7 @@ jobs:
             --cloud ${{ inputs.cloud }} \
             --cloud-region ${{ inputs.cloud-region }} \
             --cloud-type ${{ inputs.cloud-type }} \
+            --cloud-gpu ${{ inputs.cloud-gpu }} \
             --cloud-hdd-size ${{ inputs.cloud-hdd-size }} \
             --cloud-permission-set ${{ inputs.cloud-permissions-set }} \
             --single
