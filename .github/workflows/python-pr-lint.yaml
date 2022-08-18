@@ -44,3 +44,4 @@ jobs:
           JSCPD_CONFIG_FILE: "workflows/linters/jscpd.json"
           DOCKERFILE_HADOLINT_FILE_NAME: "workflows/linters/hadolint.yaml"
           NATURAL_LANGUAGE_CONFIG_FILE: "workflows/linters/.textlintrc"
+          MARKDOWN_CONFIG_FILE: "workflows/linters/.markdownlint.yaml"
