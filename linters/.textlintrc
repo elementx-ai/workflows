@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "terminology": {
+      "exclude": [
+        "Bug Fixes",
+        "github",
+        "lock file"
+      ]
+    }
+  }
+}
