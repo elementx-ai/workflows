@@ -106,6 +106,13 @@ jobs:
       # Workaround for setup-python: https://github.com/actions/setup-python/issues/485
       AGENT_TOOLSDIRECTORY: "/opt/hostedtoolcache"
     steps:
+      - name: debug
+        run: |
+          echo $RUNNER_TOOL_CACHE
+          echo $AGENT_TOOLSDIRECTORY
+          ls $RUNNER_TOOL_CACHE
+          ls $AGENT_TOOLSDIRECTORY
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
