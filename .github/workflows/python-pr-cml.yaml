@@ -68,6 +68,8 @@ jobs:
     if: ${{ startsWith(needs.init.outputs.message, 'cml') || github.event_name == 'workflow_dispatch'}}
     env:
       GOOGLE_APPLICATION_CREDENTIALS_DATA: ${{ secrets.GCP_CREDENTIALS }}
+      # Workaround for setup-python: https://github.com/actions/setup-python/issues/485
+      AGENT_TOOLSDIRECTORY: "/opt/hostedtoolcache"
     steps:
       - name: Generate Token
         uses: navikt/github-app-token-generator@v1
