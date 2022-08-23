@@ -104,11 +104,6 @@ jobs:
     env:
       REPO_TOKEN: ${{ github.token }}
     steps:
-      - name: debug
-        run: |
-          echo $RUNNER_TOOL_CACHE
-          ls $RUNNER_TOOL_CACHE
-
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -136,8 +131,21 @@ jobs:
       - name: Add Poetry Google Artifact Registry Auth Plugin
         run: poetry plugin add keyrings.google-artifactregistry-auth
 
+      - name: debug
+        run: |
+          echo $RUNNER_TOOL_CACHE
+          ls $RUNNER_TOOL_CACHE
+          echo $CPATH
+          ls $CPATH
+        env:
+          # Add python includes from tool cache to CPATH to make building work
+          CPATH: $CPATH:${{ runner.tool_cache }}/Python/*/x64/include
+
       - name: Poetry Install
         run: poetry install
+        env:
+          # Add python includes from tool cache to CPATH to make building work
+          CPATH: $CPATH:${{ runner.tool_cache }}/Python/*/x64/include
 
       - name: Setup GCSFuse
         run: |
