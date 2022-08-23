@@ -143,13 +143,13 @@ jobs:
           ls $CPATH
         env:
           # Add python includes from tool cache to CPATH to make building work
-          CPATH: ${{ runner.tool_cache }}/Python/*/x64/include
+          CPATH: ${{ runner.tool_cache }}/Python/*/x64/include/**
 
       - name: Poetry Install
         run: poetry install
         env:
           # Add python includes from tool cache to CPATH to make building work
-          CPATH: ${{ runner.tool_cache }}/Python/*/x64/include
+          CPATH: ${{ runner.tool_cache }}/Python/*/x64/include/**
 
       - name: Setup GCSFuse
         run: |
