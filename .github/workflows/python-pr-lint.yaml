@@ -39,9 +39,9 @@ jobs:
           # it's redundant to pylint
           VALIDATE_PYTHON_FLAKE8: false
           # Do almost all config in pyproject.toml
-          PYTHON_BLACK_CONFIG_FILE: ${{ format("{0}/{1}", inputs.directory, "pyproject.toml") }}
-          PYTHON_ISORT_CONFIG_FILE: ${{ format("{0}/{1}", inputs.directory, "pyproject.toml") }}
-          PYTHON_MYPY_CONFIG_FILE: ${{ format("{0}/{1}", inputs.directory, "pyproject.toml") }}
+          PYTHON_BLACK_CONFIG_FILE: ${{ format('{0}/{1}', inputs.directory, 'pyproject.toml') }}
+          PYTHON_ISORT_CONFIG_FILE: ${{ format('{0}/{1}', inputs.directory, 'pyproject.toml') }}
+          PYTHON_MYPY_CONFIG_FILE: ${{ format('{0}/{1}', inputs.directory, 'pyproject.toml') }}
           # Pylint config is in a seperate file because
           # we have a very large config
           PYTHON_PYLINT_CONFIG_FILE: "workflows/linters/.pylintrc"
