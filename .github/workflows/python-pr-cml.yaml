@@ -103,6 +103,8 @@ jobs:
     timeout-minutes: 4320
     env:
       REPO_TOKEN: ${{ github.token }}
+      # Workaround for setup-python: https://github.com/actions/setup-python/issues/485
+      AGENT_TOOLSDIRECTORY: "/opt/hostedtoolcache"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
