@@ -116,9 +116,13 @@ jobs:
           node-version: 16
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
+        env:
+          # Workaround for setup-python: https://github.com/actions/setup-python/issues/485
+          AGENT_TOOLSDIRECTORY: "/opt/hostedtoolcache"
+
 
       - name: Setup Poetry
         uses: abatilo/actions-poetry@v2.1.4
