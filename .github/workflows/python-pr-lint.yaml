@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'spark-64/workflows'
+          ref: 'revert/lock-super-linter-to-4.9.5'
           path: 'workflows'
 
       - name: Lint Code Base
