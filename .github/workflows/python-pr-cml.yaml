@@ -149,7 +149,7 @@ jobs:
       - name: Mount Bucket
         run: |
           mkdir -p dataset-bucket
-          gcsfuse --implicit-dirs ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }} dataset-bucket/
+          gcsfuse --debug_gcs --debug_fuse --implicit-dirs ${{ secrets.GOOGLE_SAINET_DATASET_BUCKET }} dataset-bucket/
 
       - name: Setup GPU Drivers
         if: ${{ contains(inputs.cloud-type, 'nvidia') }}
