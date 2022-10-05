@@ -35,6 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           IGNORE_GITIGNORED_FILES: true
           IGNORE_GENERATED_FILES: true
+          FILTER_REGEX_INCLUDE: ${{ format('{0}/*', inputs.directory) }}
           # Skip flake8 as configuring it is annoying and
           # it's redundant to pylint
           VALIDATE_PYTHON_FLAKE8: false
