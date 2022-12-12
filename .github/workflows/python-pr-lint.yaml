@@ -23,7 +23,7 @@ jobs:
       - name: Checkout Linters
         uses: actions/checkout@v3
         with:
-          repository: 'spark-64/workflows'
+          repository: 'elementx-ai/workflows'
           path: 'workflows'
 
       - name: Lint Code Base
@@ -53,3 +53,5 @@ jobs:
           # Ignore natural language as this is only a "terminology" rule
           # that conflicts with the release-please changelog
           VALIDATE_NATURAL_LANGUAGE: false
+          # Ignore Kubernetes service definition linting
+          VALIDATE_KUBERNETES_KUBEVAL: false
