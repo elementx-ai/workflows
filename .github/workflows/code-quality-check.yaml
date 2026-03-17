@@ -1,0 +1,21 @@
+name: Code Quality Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Run quality checks
+    runs-on: ubuntu-latest
+    steps:
+      - id: quality
+        uses: elementx-ai/code-quality-check@main
+        with:
+          changed-only: true
+          base-ref: ${{ github.event.pull_request.base.sha || github.event.before }}
+          project-depth: 1
