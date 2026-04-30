@@ -16,4 +16,26 @@ Runs code quality checks using [elementx-ai/code-quality-check](https://github.c
 
 ### Codeowners Merge
 
-Allows CODEOWNERS to self-merge pull requests using [elementx-ai/code-owner-self-merge](https://github.com/elementx-ai/code-owner-self-merge). Triggers on PR open, issue comments, and PR review submissions. Uses a GitHub App token (configured via `CODEOWNERS_APP_ID` and `CODEOWNERS_APP_PRIVATE_KEY`) to perform squash merges.
+A shared (reusable) workflow that allows CODEOWNERS to self-merge pull requests using [elementx-ai/code-owner-self-merge](https://github.com/elementx-ai/code-owner-self-merge). Uses a GitHub App token (configured via `CODEOWNERS_APP_ID` and `CODEOWNERS_APP_PRIVATE_KEY`) to perform squash merges.
+
+Call it from each consuming repo rather than copying it:
+
+```yaml
+# .github/workflows/codeowners-merge.yaml
+name: Codeowners Merge
+
+on:
+  pull_request_target: { types: [opened] }
+  issue_comment: { types: [created] }
+  pull_request_review: { types: [submitted] }
+
+jobs:
+  merge-check:
+    if: >
+      github.event_name != 'issue_comment' ||
+        github.event.issue.pull_request != ''
+    uses: elementx-ai/workflows/.github/workflows/codeowners-merge.yaml@main
+    secrets: inherit
+```
+
+The `if` condition on the calling job prevents the workflow from running on plain issue comments (i.e. comments on issues that are not pull requests).

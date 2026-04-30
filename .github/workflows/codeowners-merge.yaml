@@ -1,12 +1,14 @@
 ---
 name: Codeowners Merge
+
 on:
-  pull_request_target: { types: [ opened ] }
-  issue_comment: { types: [ created ] }
-  pull_request_review: { types: [ submitted ] }
+  workflow_call: {}
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  merge-check:
     runs-on: ubuntu-latest
     steps:
       - name: Generate a token
