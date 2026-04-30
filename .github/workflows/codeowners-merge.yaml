@@ -1,0 +1,23 @@
+---
+name: Codeowners Merge
+on:
+  pull_request_target: { types: [ opened ] }
+  issue_comment: { types: [ created ] }
+  pull_request_review: { types: [ submitted ] }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v2.1.4
+        with:
+          app-id: ${{ vars.CODEOWNERS_APP_ID }}
+          private-key: ${{ secrets.CODEOWNERS_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v6
+      - name: Run Codeowners merge check
+        uses: elementx-ai/code-owner-self-merge@main
+        with:
+          merge_method: 'squash'
+          token: ${{ steps.generate-token.outputs.token }}
