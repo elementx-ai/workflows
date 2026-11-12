@@ -12,6 +12,7 @@ jobs:
   checks:
     name: Run quality checks
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - id: quality
         uses: elementx-ai/code-quality-check@main
